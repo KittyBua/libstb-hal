@@ -837,16 +837,12 @@ bool cVideo::ShowPicture(const char *fname)
 		hal_info("%s: video_standby == true\n", __func__);
 		return ret;
 	}
-	/* Maybe fd is closed, but what is the problem? Later we call openDevice().
-	   Works on following boxmodels */
-#if !BOXMODEL_HISILICON && !BOXMODEL_BRE2ZE4K && !BOXMODEL_H7 && !BOXMODEL_H51 && !BOXMODEL_HD60 && !BOXMODEL_HD61 && !BOXMODEL_MULTIBOX && !BOXMODEL_MULTIBOXSE
 	/* in movieplayer mode, fd is not opened */
 	if (fd == -1)
 	{
 		hal_info("%s: decoder not opened\n", __func__);
 		return ret;
 	}
-#endif
 
 	struct stat st;
 	if (stat(fname, &st))
