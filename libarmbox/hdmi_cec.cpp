@@ -790,12 +790,41 @@ void hdmi_cec::rc_sync(int fd)
 {
 	struct input_event ev;
 
-	gettimeofday(&ev.time, NULL);
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+
+	// Depending on the structure definition in input.h, assign the time values
+#if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
+	ev.time.tv_sec = tv.tv_sec;
+	ev.time.tv_usec = tv.tv_usec;
+#else
+	ev.__sec = tv.tv_sec;
+	ev.__usec = tv.tv_usec;
+#endif
+
 	ev.type = EV_SYN;
 	ev.code = SYN_REPORT;
 	ev.value = 0;
-	write(fd, &ev, sizeof(ev));
+
+	ssize_t bytes_written = write(fd, &ev, sizeof(ev));
+
+	// Debugging information
+	if (bytes_written != sizeof(ev))
+	{
+		hal_info(RED "[CEC] Error writing sync event to device\n" NORMAL);
+	}
+	else
+	{
+		hal_info(GREEN "[CEC] Sync event written successfully\n" NORMAL);
+
+#if (__BITS_PER_LONG != 32 || !defined(__USE_TIME_BITS64)) && !defined(__KERNEL__)
+		hal_info(GREEN "[CEC] Event time: %ld.%06ld\n" NORMAL, ev.time.tv_sec, ev.time.tv_usec);
+#else
+		hal_info(GREEN "[CEC] Event time: %ld.%06ld\n" NORMAL, ev.__sec, ev.__usec);
+#endif
+	}
 }
+
 
 void hdmi_cec::send_key(unsigned char key, unsigned char destination)
 {
