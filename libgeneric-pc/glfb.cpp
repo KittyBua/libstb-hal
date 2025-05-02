@@ -337,7 +337,6 @@ void GLFbPC::releaseGLObjects()
 	ev.code = i->second;
 	ev.value = 1; /* key own */
 	ev.type = EV_KEY;
-	gettimeofday(&ev.time, NULL);
 	hal_debug_c("GLFB::%s: pushing 0x%x\n", __func__, ev.code);
 	write(glfb_priv->input_fd, &ev, sizeof(ev));
 	ev.value = 0; /* neutrino is stupid, so push key up directly after key down */
@@ -354,7 +353,6 @@ void GLFbPC::releaseGLObjects()
 	ev.code = i->second;
 	ev.value = 1;
 	ev.type = EV_KEY;
-	gettimeofday(&ev.time, NULL);
 	hal_debug_c("GLFB::%s: pushing 0x%x\n", __func__, ev.code);
 	write(glfb_priv->input_fd, &ev, sizeof(ev));
 	ev.value = 0;
